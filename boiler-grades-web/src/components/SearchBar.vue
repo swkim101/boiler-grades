@@ -83,18 +83,16 @@ export default {
     
     methods: {
         filter(item, queryText, itemText) {
-            itemText = itemText.replace(",", "").replace(".", "");
-            queryText = queryText.replace(",", "").replace(".", "");
-            //remove spaces if first two characters are capital (probably a course number) 
-            if (queryText.charCodeAt(0) >= 65 && queryText.charCodeAt(0) <= 90 
-                && queryText.charCodeAt(1) >= 65 && queryText.charCodeAt(1) <= 90) 
-            {
-                itemText = itemText.replace(/\s/g, '');
-                queryText = queryText.replace(/\s/g, '');
+            // starts with two upper case letters = course number
+            const isCourseNumber = /^[A-Z]{2}.*/.test(queryText)
+            if (isCourseNumber) {
+                return itemText.includes(queryText)
             }
-            if (itemText.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1 ) {
-                return true;
-            }
+            const testExp = new RegExp(
+                `.*${queryText.split("").join(".*")}.*`,
+                "i"
+            )
+            return testExp.test(itemText)
         },
         getItems() {
             fetch('/api/indexes')
